@@ -22,7 +22,7 @@ export default function RouteSidebar({ route, onBookClick, isAuth }) {
                 <CardContent className="p-5">
                     <div className="mb-4 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 text-lg font-semibold">
-                            <MessageCircleMore className="h-5 w-5 text-[#ff3495]" />
+                            <MessageCircleMore className="h-5 w-5 text-[#ff3495] RooftopRegular" />
                             Отзывы
                         </div>
                         <div className="flex items-center gap-2">

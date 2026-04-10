@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Mountain, User2, LogOut, Menu, X, ShieldCheck } from "lucide-react";
 import { useAuthStore } from "../../store/authStore.js";
 import { logout } from "../../api/auth.api.js";
-import { Button } from "./ui";
+import { Button } from "./ui.jsx";
 
 const navItems = [
     { label: "Главная", target: "routes-hero" },
@@ -18,6 +18,8 @@ export default function HeaderRoutes({
     const [mobileOpen, setMobileOpen] = useState(false);
     const isAuth = useAuthStore((state) => state.isAuth);
     const user = useAuthStore((state) => state.user);
+
+    const isAdmin = user?.role === "admin";
 
     const scrollToBlock = (id) => {
         const el = document.getElementById(id);
@@ -43,13 +45,13 @@ export default function HeaderRoutes({
                     className="flex items-center gap-3"
                 >
                     <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-white/5 ring-1 ring-white/10">
-                        <Mountain className="h-6 w-6 text-[#ff3495]" />
+                        <img src="/t2_Logo_White.png" alt='ico'/>
                     </div>
                     <div className="text-left">
-                        <div className="text-sm font-medium uppercase tracking-[0.25em] text-white/45">
+                        <div className="text-sm font-medium uppercase tracking-[0.25em] text-white/45 HalvarBold">
                             Udmurtia Routes
                         </div>
-                        <div className="text-base font-semibold text-white">
+                        <div className="text-base font-semibold text-white RooftopMedium font-[10px]">
                             Туристический рандомайзер
                         </div>
                     </div>
@@ -68,14 +70,16 @@ export default function HeaderRoutes({
                 </nav>
 
                 <div className="hidden items-center gap-3 lg:flex">
-                    <Button
-                        variant="outline"
-                        className="rounded-[18px]"
-                        onClick={onOpenAdmin}
-                    >
-                        <ShieldCheck className="mr-2 h-4 w-4 text-[#ff3495]" />
-                        Панель заявок
-                    </Button>
+                    {isAdmin ? (
+                        <Button
+                            variant="outline"
+                            className="rounded-[18px]"
+                            onClick={onOpenAdmin}
+                        >
+                            <ShieldCheck className="mr-2 h-4 w-4 text-[#ff3495]" />
+                            Панель заявок
+                        </Button>
+                    ) : null}
 
                     {isAuth ? (
                         <>
@@ -83,14 +87,6 @@ export default function HeaderRoutes({
                                 <User2 className="h-4 w-4 text-[#ff3495]" />
                                 {userName}
                             </div>
-
-                            <Button
-                                variant="outline"
-                                className="rounded-[18px]"
-                                onClick={() => (window.location.href = "/profile")}
-                            >
-                                Профиль
-                            </Button>
 
                             <Button
                                 variant="outline"
@@ -138,27 +134,22 @@ export default function HeaderRoutes({
                             </button>
                         ))}
 
-                        <Button
-                            variant="outline"
-                            className="rounded-[18px]"
-                            onClick={onOpenAdmin}
-                        >
-                            <ShieldCheck className="mr-2 h-4 w-4 text-[#ff3495]" />
-                            Панель заявок
-                        </Button>
+                        {isAdmin ? (
+                            <Button
+                                variant="outline"
+                                className="rounded-[18px]"
+                                onClick={onOpenAdmin}
+                            >
+                                <ShieldCheck className="mr-2 h-4 w-4 text-[#ff3495]" />
+                                Панель заявок
+                            </Button>
+                        ) : null}
 
                         {isAuth ? (
                             <>
                                 <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/75">
                                     Пользователь: {userName}
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    className="rounded-[18px]"
-                                    onClick={() => (window.location.href = "/profile")}
-                                >
-                                    Профиль
-                                </Button>
                                 <Button
                                     variant="outline"
                                     className="rounded-[18px]"

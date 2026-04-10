@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, MapPin, Image as ImageIcon, Sparkles, CalendarDays } from "lucide-react";
-import { Input, Label } from "./ui";
+import { X, MapPin, Sparkles, Image as ImageIcon, CalendarDays, Plus, Trash2 } from "lucide-react";
+import { Input, Label } from "./ui.jsx";
 
 const emptyForm = {
     title: "",
@@ -12,16 +12,18 @@ const emptyForm = {
     transport: "car",
     budget: "econom",
     priceFrom: "от 2 900 ₽",
-    bookingDate: "",
-    image: "",
     interests: "nature,volunteer",
     tips: "Удобная обувь,Вода,Хорошее настроение",
     volunteer: true,
     volunteerImpact: "",
+    image: null,
+    gallery: [],
+    slots: [{ date: "", capacity: 1 }],
 };
 
 export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
     const [form, setForm] = useState(emptyForm);
+    const today = new Date().toISOString().split("T")[0];
 
     useEffect(() => {
         if (isOpen) {
@@ -38,6 +40,32 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
 
     if (!isOpen) return null;
 
+    const addSlot = () => {
+        setForm((prev) => ({
+            ...prev,
+            slots: [...prev.slots, { date: "", capacity: 1 }],
+        }));
+    };
+
+    const updateSlot = (index, field, value) => {
+        setForm((prev) => ({
+            ...prev,
+            slots: prev.slots.map((slot, i) =>
+                i === index ? { ...slot, [field]: value } : slot
+            ),
+        }));
+    };
+
+    const removeSlot = (index) => {
+        setForm((prev) => ({
+            ...prev,
+            slots:
+                prev.slots.length === 1
+                    ? [{ date: "", capacity: 1 }]
+                    : prev.slots.filter((_, i) => i !== index),
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -51,8 +79,24 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
             .map((item) => item.trim())
             .filter(Boolean);
 
+        const slots = form.slots
+            .filter((slot) => slot.date && slot.date >= today && Number(slot.capacity) > 0)
+            .map((slot) => ({
+                date: slot.date,
+                capacity: Number(slot.capacity),
+            }));
+
+        if (!form.image) {
+            alert("Нужно выбрать главное фото маршрута");
+            return;
+        }
+
+        if (slots.length === 0) {
+            alert("Добавь хотя бы одну будущую дату и количество мест");
+            return;
+        }
+
         const route = {
-            id: Date.now(),
             title: form.title,
             shortDescription: form.shortDescription,
             fullDescription: form.fullDescription,
@@ -72,29 +116,20 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                         ? "Автобусный"
                         : "Пеший",
             place: form.place,
-            rating: 4.8,
+            rating: 0,
             reviewsCount: 0,
             priceFrom: form.priceFrom,
-            bookingDates: form.bookingDate ? [form.bookingDate] : ["Дата уточняется"],
-            image:
-                form.image ||
-                "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop",
-            gallery: [
-                form.image ||
-                "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200&auto=format&fit=crop",
-            ],
+            image: form.image,
+            gallery: form.gallery,
             tips: tips.length ? tips : ["Уточнить детали поездки"],
             coordinates: {
                 lat: 56.85,
                 lng: 53.2,
             },
-            comments: [],
+            slots,
         };
 
         onCreateRoute(route);
-        onClose();
     };
 
     return (
@@ -110,7 +145,7 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 24, scale: 0.96 }}
                     transition={{ type: "spring", stiffness: 220, damping: 22 }}
-                    className="relative w-full max-w-4xl overflow-hidden rounded-[32px] border-[3px] border-[#ff3495] bg-[#080808] text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
+                    className="relative w-full max-w-5xl overflow-hidden rounded-[32px] border-[3px] border-[#ff3495] bg-[#080808] text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
                 >
                     <button
                         onClick={onClose}
@@ -126,6 +161,9 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                         <h3 className="text-2xl font-black uppercase leading-none sm:text-3xl">
                             Добавить маршрут
                         </h3>
+                        <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">
+                            Здесь загружаются реальные изображения, задаются даты маршрута и количество мест на каждую дату.
+                        </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="grid gap-5 p-6 sm:p-8">
@@ -151,7 +189,7 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                                     <Input
                                         value={form.place}
                                         onChange={(e) => setForm((prev) => ({ ...prev, place: e.target.value }))}
-                                        placeholder="Например: Воткинский район"
+                                        placeholder="Например: Нечкинский парк"
                                         className="pl-10"
                                         required
                                     />
@@ -198,6 +236,7 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                                     <option value="1" className="text-black">1 день</option>
                                     <option value="2" className="text-black">2 дня</option>
                                     <option value="3" className="text-black">3 дня</option>
+                                    <option value="4" className="text-black">4 дня</option>
                                 </select>
                             </div>
 
@@ -239,34 +278,6 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
 
                         <div className="grid gap-5 lg:grid-cols-2">
                             <div className="space-y-2">
-                                <Label>Дата бронирования</Label>
-                                <div className="relative">
-                                    <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
-                                    <Input
-                                        value={form.bookingDate}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, bookingDate: e.target.value }))}
-                                        placeholder="Например: 22–24 июля"
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Ссылка на изображение</Label>
-                                <div className="relative">
-                                    <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
-                                    <Input
-                                        value={form.image}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-                                        placeholder="https://..."
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid gap-5 lg:grid-cols-2">
-                            <div className="space-y-2">
                                 <Label>Интересы через запятую</Label>
                                 <Input
                                     value={form.interests}
@@ -281,6 +292,43 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                                     value={form.tips}
                                     onChange={(e) => setForm((prev) => ({ ...prev, tips: e.target.value }))}
                                     placeholder="Вода,Удобная обувь,Дождевик"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid gap-5 lg:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label>Главное фото</Label>
+                                <div className="relative">
+                                    <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) =>
+                                            setForm((prev) => ({
+                                                ...prev,
+                                                image: e.target.files?.[0] || null,
+                                            }))
+                                        }
+                                        className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 pl-10 text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-[#ff3495] file:px-3 file:py-2 file:text-white"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Галерея</Label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            gallery: Array.from(e.target.files || []),
+                                        }))
+                                    }
+                                    className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white"
                                 />
                             </div>
                         </div>
@@ -314,6 +362,66 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
                                 />
                             </div>
                         ) : null}
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-3">
+                                <Label>Даты маршрута и места</Label>
+                                <button
+                                    type="button"
+                                    onClick={addSlot}
+                                    className="inline-flex items-center gap-2 rounded-[14px] border border-[#ff3495] px-4 py-2 text-sm font-semibold text-[#ff3495] transition hover:bg-[#ff3495]/10"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Добавить дату
+                                </button>
+                            </div>
+
+                            <div className="grid gap-3">
+                                {form.slots.map((slot, index) => (
+                                    <div
+                                        key={index}
+                                        className="grid gap-3 rounded-[18px] border border-white/10 bg-white/5 p-4 sm:grid-cols-[1fr_180px_56px]"
+                                    >
+                                        <div className="space-y-2">
+                                            <Label>Дата</Label>
+                                            <div className="relative">
+                                                <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                                <input
+                                                    type="date"
+                                                    min={today}
+                                                    value={slot.date}
+                                                    onChange={(e) => updateSlot(index, "date", e.target.value)}
+                                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] pl-10 pr-4 text-white outline-none"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label>Мест</Label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={slot.capacity}
+                                                onChange={(e) => updateSlot(index, "capacity", e.target.value)}
+                                                className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] px-4 text-white outline-none focus:border-[#ff3495]"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="flex items-end">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeSlot(index)}
+                                                className="flex h-[50px] w-full items-center justify-center rounded-[18px] border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
 
 
                         <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row">

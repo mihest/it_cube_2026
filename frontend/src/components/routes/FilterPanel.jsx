@@ -16,24 +16,26 @@ export default function FilterPanel({
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="lg:sticky lg:top-6"
+            className="lg:sticky lg:top-6 flex items-center align-center"
         >
             <Card className="overflow-hidden text-white">
                 <div className="rounded-t-[32px] border border-[3px] border-[#ff3495] border-b-0 bg-[rgba(255,52,149,0.22)] px-4 py-5 backdrop-blur-2xl sm:px-6 lg:px-8">
                     <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <div className="text-xs font-black uppercase tracking-[0.22em] text-white/55">
+                        <div className="left-[28%] sticky flex flex-col">
+                            <div className="text-xs font-black uppercase tracking-[0.22em] text-white/55 HalvarBold" >
                                 Фильтр маршрута
                             </div>
-                            <h2 className="mt-2 text-2xl font-black uppercase leading-none sm:text-3xl">
+                            <h2 className="mt-2 text-2xl font-black uppercase leading-none sm:text-3xl HalvarBold">
                                 Подобрать маршрут
                             </h2>
                         </div>
-                        <div className="hidden h-12 w-12 rounded-[14px] border border-white/15 bg-black/15 sm:block" />
+                        <div className="hidden h-12 w-12 rounded-[14px] border border-white/15 bg-black/15 sm:block justify-center content-center p-2">
+                            <img src="/t2_Logo_MonoWhite.png" alt="Фото" />
+                        </div>
                     </div>
                 </div>
 
-                <CardContent className="space-y-6 border-[3px] border-[#ff3495] bg-[#080808] p-4 sm:p-6 lg:p-8 mt-[-2px]">
+                <CardContent className="space-y-6 border-[3px] border-[#ff3495] bg-[#080808] p-4 sm:p-6 lg:p-8 mt-[-2px] RooftopRegular">
                     <div className="space-y-2">
                         <Label>Поиск по названию или месту</Label>
                         <div className="relative">
@@ -91,14 +93,14 @@ export default function FilterPanel({
                         </div>
                     </div>
 
-                    <div className="grid gap-6 xl:grid-cols-2">
+                    <div className="grid gap-3 xl:grid-cols-2">
                         <div className="space-y-3">
                             <Label>Транспорт</Label>
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {[
                                     ["any", "Не важно"],
                                     ["walking", "Пеший"],
-                                    ["car", "Автомобиль"],
+                                    ["car", "Авто"],
                                     ["bus", "Автобус"],
                                 ].map(([value, label]) => (
                                     <motion.label

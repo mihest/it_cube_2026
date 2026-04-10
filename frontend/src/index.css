@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "HalvarBold";
+  src: url("/fonts/HalvarBreitt2-XBd.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "RooftopMedium";
+  src: url("/fonts/t2-Rooftop-Medium.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "RooftopRegular";
+  src: url("/fonts/t2-Rooftop-Regular.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+.HalvarBold{
+  font-family: HalvarBold;
+}
+.RooftopMedium{
+  font-family: RooftopMedium;
+}
+.RooftopRegular{
+  font-family: RooftopRegular;
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;

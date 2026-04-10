@@ -1,10 +1,16 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BadgeInfo, Search } from "lucide-react";
 
 import { useAuthStore } from "./store/authStore.js";
-import { routesData } from "./utils/routesData.js";
-import { mockBookings } from "./utils/mockBookings.js";
+import { refreshSession } from "./api/auth.api.js";
+import { getRoutes } from "./api/routes.api.js";
+import { createBooking } from "./api/bookings.api.js";
+import {
+  createAdminRoute,
+  getAdminBookings,
+  updateAdminBookingStatus,
+} from "./api/admin.api.js";
 
 import HeaderRoutes from "./components/routes/HeaderRoutes.jsx";
 import HeroRoutes from "./components/routes/HeroRoutes.jsx";
@@ -30,11 +36,23 @@ function getRandomItem(items, currentId = null) {
   return next;
 }
 
+function normalizeBooking(booking) {
+  return {
+    ...booking,
+    createdAt: booking?.createdAt
+        ? new Date(booking.createdAt).toLocaleString("ru-RU")
+        : "",
+  };
+}
+
 export default function App() {
   const isAuth = useAuthStore((state) => state.isAuth);
   const user = useAuthStore((state) => state.user);
+  const isLoadingAuth = useAuthStore((state) => state.isLoading);
 
-  const [routes, setRoutes] = useState(routesData);
+  const [routes, setRoutes] = useState([]);
+  const [routesLoading, setRoutesLoading] = useState(true);
+  const [routesError, setRoutesError] = useState("");
 
   const [filters, setFilters] = useState({
     company: "any",
@@ -57,9 +75,44 @@ export default function App() {
 
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAddRouteOpen, setIsAddRouteOpen] = useState(false);
-  const [bookings, setBookings] = useState(mockBookings);
+  const [bookings, setBookings] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
 
   const resultSectionRef = useRef(null);
+
+  useEffect(() => {
+    refreshSession();
+    loadRoutes();
+  }, []);
+
+  const loadRoutes = async () => {
+    setRoutesLoading(true);
+    setRoutesError("");
+
+    try {
+      const data = await getRoutes();
+      setRoutes(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error(e);
+      setRoutesError("Не удалось загрузить маршруты.");
+    } finally {
+      setRoutesLoading(false);
+    }
+  };
+
+  const loadAdminBookings = async () => {
+    setAdminLoading(true);
+
+    try {
+      const data = await getAdminBookings();
+      setBookings((data || []).map(normalizeBooking));
+    } catch (e) {
+      console.error(e);
+      alert(e?.response?.data?.message || "Не удалось загрузить бронирования.");
+    } finally {
+      setAdminLoading(false);
+    }
+  };
 
   const filteredRoutes = useMemo(() => {
     return routes.filter((route) => {
@@ -75,16 +128,14 @@ export default function App() {
       const matchPets = !filters.withPets || route.petsAllowed;
       const matchVolunteer = !filters.volunteerOnly || route.volunteer;
 
+      const search = filters.search.trim().toLowerCase();
+
       const matchSearch =
-          !filters.search ||
-          route.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-          route.shortDescription
-              .toLowerCase()
-              .includes(filters.search.toLowerCase()) ||
-          route.place.toLowerCase().includes(filters.search.toLowerCase()) ||
-          route.fullDescription
-              .toLowerCase()
-              .includes(filters.search.toLowerCase());
+          !search ||
+          route.title.toLowerCase().includes(search) ||
+          route.shortDescription.toLowerCase().includes(search) ||
+          route.place.toLowerCase().includes(search) ||
+          route.fullDescription.toLowerCase().includes(search);
 
       const matchInterests =
           filters.interests.length === 0 ||
@@ -182,50 +233,78 @@ export default function App() {
     openBookingModal(route);
   };
 
-  const handleSubmitBooking = ({ route, form }) => {
-    const booking = {
-      id: Date.now(),
-      status: "pending",
-      createdAt: new Date().toLocaleString("ru-RU"),
-      route: {
-        id: route.id,
-        title: route.title,
-        place: route.place,
-        duration: route.duration,
-        date: form.date,
-        priceFrom: route.priceFrom,
-      },
-      user: {
-        fullName:
-            user?.fullName ||
-            user?.name ||
-            user?.username ||
-            form.name ||
-            "Пользователь",
-        username: user?.username || "user",
-        email: user?.email || "email@example.com",
+  const handleSubmitBooking = async ({ route, form }) => {
+    try {
+      const created = await createBooking({
+        routeId: route.id,
+        slotId: form.slotId,
+        people: form.people,
         phone: form.phone,
-      },
-      people: form.people,
-      comment: form.comment,
-    };
+        comment: form.comment,
+      });
 
-    setBookings((prev) => [booking, ...prev]);
-    alert("Заявка на бронирование отправлена");
+      setBookings((prev) => [normalizeBooking(created), ...prev]);
+      await loadRoutes();
+      alert("Заявка на бронирование отправлена");
+    } catch (e) {
+      console.error(e);
+      alert(
+          e?.response?.data?.message || "Не удалось отправить заявку."
+      );
+    }
   };
 
-  const handleUpdateBookingStatus = (bookingId, nextStatus) => {
-    setBookings((prev) =>
-        prev.map((item) =>
-            item.id === bookingId ? { ...item, status: nextStatus } : item
-        )
-    );
+  const handleOpenAdmin = async () => {
+    if (!isAuth) {
+      setAuthMode("login");
+      setIsAuthOpen(true);
+      return;
+    }
+
+    if (user?.role !== "admin") {
+      alert("Доступ только для администратора.");
+      return;
+    }
+
+    setIsAdminOpen(true);
+    await loadAdminBookings();
   };
 
-  const handleCreateRoute = (newRoute) => {
-    setRoutes((prev) => [newRoute, ...prev]);
-    setIsAddRouteOpen(false);
-    alert("Маршрут добавлен локально");
+  const handleUpdateBookingStatus = async (bookingId, nextStatus) => {
+    try {
+      const updated = await updateAdminBookingStatus(bookingId, nextStatus);
+      const normalized = normalizeBooking(updated);
+
+      setBookings((prev) =>
+          prev.map((item) => (item.id === bookingId ? normalized : item))
+      );
+    } catch (e) {
+      console.error(e);
+      alert(e?.response?.data?.message || "Не удалось обновить статус брони.");
+    }
+  };
+
+  const handleCreateRoute = async (newRoute) => {
+    try {
+      const created = await createAdminRoute(newRoute);
+      setRoutes((prev) => [created, ...prev]);
+      setIsAddRouteOpen(false);
+      alert("Маршрут добавлен");
+    } catch (e) {
+      console.error("CREATE ROUTE ERROR:", e?.response?.data || e);
+
+      const errors = e?.response?.data?.errors;
+
+      if (errors) {
+        const text = Object.entries(errors)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
+            .join("\n");
+
+        alert(text);
+      } else {
+        alert(e?.response?.data?.message || "Не удалось добавить маршрут.");
+      }
+    }
   };
 
   return (
@@ -233,7 +312,7 @@ export default function App() {
         <HeaderRoutes
             onOpenLogin={openLoginModal}
             onOpenRegister={openRegisterModal}
-            onOpenAdmin={() => setIsAdminOpen(true)}
+            onOpenAdmin={handleOpenAdmin}
         />
 
         <section
@@ -243,7 +322,7 @@ export default function App() {
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1800&auto=format&fit=crop')] bg-cover bg-center opacity-50" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,52,149,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(255,52,149,0.12),transparent_25%)]" />
 
-          <div className="relative mx-auto max-w-[1600px] px-4 pb-12 pt-8 sm:px-6 lg:px-10 xl:px-16">
+          <div className="relative mx-auto max-w-[1700px] px-4 pb-12 pt-8 sm:px-6 lg:px-10 xl:px-16">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
               <HeroRoutes filteredCount={filteredRoutes.length} />
 
@@ -261,7 +340,7 @@ export default function App() {
         <section
             id="routes-result"
             ref={resultSectionRef}
-            className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20 xl:px-16"
+            className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20 xl:px-16 flex flex-col justify-center items-center"
         >
           <SectionTitle
               eyebrow="Результат"
@@ -271,7 +350,22 @@ export default function App() {
           />
 
           <div className="mt-10">
-            {!hasSearched ? (
+            {routesLoading || isLoadingAuth ? (
+                <Card className="border border-white/10 bg-white/5 shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+                  <CardContent className="flex min-h-[320px] items-center justify-center p-8 text-center text-white/65">
+                    Загрузка данных...
+                  </CardContent>
+                </Card>
+            ) : routesError ? (
+                <Card className="border border-white/10 bg-white/5 shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+                  <CardContent className="flex min-h-[320px] flex-col items-center justify-center p-8 text-center">
+                    <div className="text-white/70">{routesError}</div>
+                    <Button onClick={loadRoutes} className="mt-5 rounded-[18px]">
+                      Повторить загрузку
+                    </Button>
+                  </CardContent>
+                </Card>
+            ) : !hasSearched ? (
                 <AnimatePresence mode="wait">
                   <motion.div
                       key="placeholder"
@@ -381,6 +475,12 @@ export default function App() {
             onClose={() => setIsAddRouteOpen(false)}
             onCreateRoute={handleCreateRoute}
         />
+
+        {isAdminOpen && adminLoading ? (
+            <div className="fixed bottom-5 right-5 rounded-[18px] border border-white/10 bg-black/70 px-4 py-3 text-sm text-white/75 backdrop-blur">
+              Обновление заявок...
+            </div>
+        ) : null}
       </div>
   );
 }

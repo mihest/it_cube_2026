@@ -24,13 +24,13 @@ export default function HeroRoutes({ filteredCount }) {
                 </div>
 
                 <div className="space-y-5">
-                    <h1 className="max-w-5xl text-3xl font-black uppercase leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+                    <h1 className="HalvarBold max-w-5xl text-3xl font-black uppercase leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
                         Маршруты по Удмуртии
                         <br />
                         с акцентом на волонтёрский туризм
                     </h1>
 
-                    <p className="max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
+                    <p className=" RooftopRegular max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
                         Сервис подбирает маршруты не только по отдыху и интересам, но и помогает
                         включать в поездку общественно полезные активности: помощь природе,
                         участие в локальных экологических акциях и взаимодействие с местными
@@ -84,13 +84,13 @@ export default function HeroRoutes({ filteredCount }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.85, y: -8 }}
                         transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                        className="text-[42px] font-black leading-none sm:text-[56px] xl:text-[72px]"
+                        className=" HalvarBold text-[42px] font-black leading-none sm:text-[56px] xl:text-[72px]"
                     >
                         {filteredCount}
                     </motion.div>
                 </AnimatePresence>
 
-                <div className="text-sm text-white/70">
+                <div className="text-sm text-white/70 RooftopRegular">
                     После нажатия будет выбран случайный маршрут из найденных.
                 </div>
 
