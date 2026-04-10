@@ -57,7 +57,7 @@ export default function RouteCard({ route, onBookClick, isAuth, onShuffle }) {
                             transition={{ delay: 0.15, duration: 0.35 }}
                             className="absolute bottom-0 left-0 right-0 p-4 sm:p-6"
                         >
-                            <div className="mb-3 flex flex-wrap gap-2">
+                            <div className="mb-3 md:flex flex-wrap gap-2 hidden">
                                 {route.interests.map((tag) => (
                                     <Badge
                                         key={tag}
@@ -74,7 +74,7 @@ export default function RouteCard({ route, onBookClick, isAuth, onShuffle }) {
                             </div>
 
                             <h3 className="HalvarBold text-2xl font-black uppercase sm:text-3xl">{route.title}</h3>
-                            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/75 sm:text-base RooftopRegular">
+                            <p className="mt-2 max-w-3xl md:flex hidden text-sm leading-6 text-white/75 sm:text-base RooftopRegular">
                                 {route.shortDescription}
                             </p>
 

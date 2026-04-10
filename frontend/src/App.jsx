@@ -342,12 +342,6 @@ export default function App() {
             ref={resultSectionRef}
             className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20 xl:px-16 flex flex-col justify-center items-center"
         >
-          <SectionTitle
-              eyebrow="Результат"
-              title="Маршрут, карта, отзывы и бронирование"
-              text="После нажатия на кнопку сайт фильтрует данные и показывает один случайный маршрут. Волонтёрские поездки визуально выделены и содержат блок с общественно полезным вкладом."
-              dark
-          />
 
           <div className="mt-10">
             {routesLoading || isLoadingAuth ? (
