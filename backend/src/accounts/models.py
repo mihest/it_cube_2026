@@ -20,6 +20,7 @@ class UserModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    full_name: Mapped[str] = mapped_column(String(100), nullable=False)
     hashed_password: Mapped[str] = mapped_column(
         String(1024), nullable=False
     )

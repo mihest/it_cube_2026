@@ -10,6 +10,7 @@ from src.accounts.models import UserRoleEnum
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=5)
+    full_name: str = Field(...)
 
 
 class UserCreate(UserBase):
@@ -42,6 +43,7 @@ class UserCreateDB(UserBase):
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
+    full_name: Optional[str] = None
     password: Optional[SecretStr] = None
     confirm_password: Optional[SecretStr] = None
 
@@ -88,6 +90,7 @@ class UserUpdateAdmin(UserUpdate):
 
 class UserUpdateDB(BaseModel):
     username: Optional[str] = None
+    full_name: Optional[str] = None
     hashed_password: Optional[str] = None
     role: Optional[UserRoleEnum] = None
 
@@ -95,5 +98,6 @@ class UserUpdateDB(BaseModel):
 class UserResponse(BaseModel):
     id: uuid.UUID
     username: str
+    full_name: str
     role: UserRoleEnum
     is_deleted: bool
