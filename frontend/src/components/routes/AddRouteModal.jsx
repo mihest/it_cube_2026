@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, MapPin, Sparkles, Image as ImageIcon, CalendarDays, Plus, Trash2 } from "lucide-react";
+import {
+    X,
+    MapPin,
+    Sparkles,
+    Image as ImageIcon,
+    CalendarDays,
+    Plus,
+    Trash2,
+} from "lucide-react";
 import { Input, Label } from "./ui.jsx";
 
 const emptyForm = {
@@ -23,7 +31,6 @@ const emptyForm = {
 
 export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
     const [form, setForm] = useState(emptyForm);
-    const today = new Date().toISOString().split("T")[0];
 
     useEffect(() => {
         if (isOpen) {
@@ -39,6 +46,8 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
     }, [isOpen]);
 
     if (!isOpen) return null;
+
+    const today = new Date().toISOString().split("T")[0];
 
     const addSlot = () => {
         setForm((prev) => ({
@@ -87,7 +96,7 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
             }));
 
         if (!form.image) {
-            alert("Нужно выбрать главное фото маршрута");
+            alert("Выбери главное фото маршрута");
             return;
         }
 
@@ -135,312 +144,309 @@ export default function AddRouteModal({ isOpen, onClose, onCreateRoute }) {
     return (
         <AnimatePresence>
             <motion.div
-                className="fixed inset-0 z-[130] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+                className="fixed inset-0 z-[130] overflow-y-auto bg-black/75 backdrop-blur-md"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 24, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 24, scale: 0.96 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 22 }}
-                    className="relative w-full max-w-5xl overflow-hidden rounded-[32px] border-[3px] border-[#ff3495] bg-[#080808] text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
-                >
-                    <button
-                        onClick={onClose}
-                        className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/65 transition hover:bg-white/10 hover:text-white"
+                <div className="flex min-h-full items-start justify-center p-2 sm:p-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 24, scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 220, damping: 22 }}
+                        className="relative my-2 flex w-full max-w-5xl flex-col overflow-hidden rounded-[24px] border-[3px] border-[#ff3495] bg-[#080808] text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)] sm:my-6 sm:rounded-[32px] max-h-[calc(100vh-16px)] sm:max-h-[calc(100vh-48px)]"
                     >
-                        <X className="h-5 w-5" />
-                    </button>
+                        <button
+                            onClick={onClose}
+                            className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/65 transition hover:bg-white/10 hover:text-white sm:right-5 sm:top-5"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
 
-                    <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(255,52,149,0.22),rgba(255,52,149,0.04))] p-6 sm:p-8">
-                        <div className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-white/55">
-                            Панель администратора
+                        <div className="shrink-0 border-b border-white/10 bg-[linear-gradient(135deg,rgba(255,52,149,0.22),rgba(255,52,149,0.04))] p-4 pr-14 sm:p-8 sm:pr-16">
+                            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-white/55 sm:text-xs">
+                                Панель администратора
+                            </div>
+                            <h3 className="text-xl font-black uppercase leading-none sm:text-3xl">
+                                Добавить маршрут
+                            </h3>
+                            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">
+                                Здесь загружаются изображения, задаются даты маршрута и количество мест на каждую дату.
+                            </p>
                         </div>
-                        <h3 className="text-2xl font-black uppercase leading-none sm:text-3xl">
-                            Добавить маршрут
-                        </h3>
-                        <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">
-                            Здесь загружаются реальные изображения, задаются даты маршрута и количество мест на каждую дату.
-                        </p>
-                    </div>
 
-                    <form onSubmit={handleSubmit} className="grid gap-5 p-6 sm:p-8">
-                        <div className="grid gap-5 lg:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label>Название маршрута</Label>
-                                <div className="relative">
-                                    <Sparkles className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
-                                    <Input
-                                        value={form.title}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                                        placeholder="Например: Волонтёрский тур «Чистый берег»"
-                                        className="pl-10"
-                                        required
-                                    />
+                        <form
+                            onSubmit={handleSubmit}
+                            className="grid gap-4 overflow-y-auto p-4 sm:gap-5 sm:p-8"
+                        >
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label>Название маршрута</Label>
+                                    <div className="relative">
+                                        <Sparkles className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                        <Input
+                                            value={form.title}
+                                            onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                                            placeholder="Название маршрута"
+                                            className="pl-10"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Локация</Label>
+                                    <div className="relative">
+                                        <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                        <Input
+                                            value={form.place}
+                                            onChange={(e) => setForm((prev) => ({ ...prev, place: e.target.value }))}
+                                            placeholder="Например: Ижевск"
+                                            className="pl-10"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Локация</Label>
-                                <div className="relative">
-                                    <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
-                                    <Input
-                                        value={form.place}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, place: e.target.value }))}
-                                        placeholder="Например: Нечкинский парк"
-                                        className="pl-10"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Краткое описание</Label>
-                            <textarea
-                                rows={3}
-                                value={form.shortDescription}
-                                onChange={(e) =>
-                                    setForm((prev) => ({ ...prev, shortDescription: e.target.value }))
-                                }
-                                placeholder="Короткий текст для карточки маршрута"
-                                className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Полное описание</Label>
-                            <textarea
-                                rows={4}
-                                value={form.fullDescription}
-                                onChange={(e) =>
-                                    setForm((prev) => ({ ...prev, fullDescription: e.target.value }))
-                                }
-                                placeholder="Подробное описание маршрута"
-                                className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
-                                required
-                            />
-                        </div>
-
-                        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                            <div className="space-y-2">
-                                <Label>Длительность</Label>
-                                <select
-                                    value={form.duration}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, duration: e.target.value }))}
-                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
-                                >
-                                    <option value="1" className="text-black">1 день</option>
-                                    <option value="2" className="text-black">2 дня</option>
-                                    <option value="3" className="text-black">3 дня</option>
-                                    <option value="4" className="text-black">4 дня</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Транспорт</Label>
-                                <select
-                                    value={form.transport}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, transport: e.target.value }))}
-                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
-                                >
-                                    <option value="car" className="text-black">Авто</option>
-                                    <option value="bus" className="text-black">Автобус</option>
-                                    <option value="walking" className="text-black">Пеший</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Бюджет</Label>
-                                <select
-                                    value={form.budget}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, budget: e.target.value }))}
-                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
-                                >
-                                    <option value="econom" className="text-black">Эконом</option>
-                                    <option value="medium" className="text-black">Средний</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Цена</Label>
-                                <Input
-                                    value={form.priceFrom}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, priceFrom: e.target.value }))}
-                                    placeholder="от 2 900 ₽"
+                                <Label>Краткое описание</Label>
+                                <textarea
+                                    rows={3}
+                                    value={form.shortDescription}
+                                    onChange={(e) =>
+                                        setForm((prev) => ({ ...prev, shortDescription: e.target.value }))
+                                    }
+                                    className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
                                     required
                                 />
                             </div>
-                        </div>
 
-                        <div className="grid gap-5 lg:grid-cols-2">
                             <div className="space-y-2">
-                                <Label>Интересы через запятую</Label>
-                                <Input
-                                    value={form.interests}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, interests: e.target.value }))}
-                                    placeholder="nature,volunteer,active"
+                                <Label>Полное описание</Label>
+                                <textarea
+                                    rows={4}
+                                    value={form.fullDescription}
+                                    onChange={(e) =>
+                                        setForm((prev) => ({ ...prev, fullDescription: e.target.value }))
+                                    }
+                                    className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
+                                    required
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Советы через запятую</Label>
-                                <Input
-                                    value={form.tips}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, tips: e.target.value }))}
-                                    placeholder="Вода,Удобная обувь,Дождевик"
-                                />
-                            </div>
-                        </div>
+                            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                <div className="space-y-2">
+                                    <Label>Длительность</Label>
+                                    <select
+                                        value={form.duration}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, duration: e.target.value }))}
+                                        className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
+                                    >
+                                        <option value="1" className="text-black">1 день</option>
+                                        <option value="2" className="text-black">2 дня</option>
+                                        <option value="3" className="text-black">3 дня</option>
+                                        <option value="4" className="text-black">4 дня</option>
+                                    </select>
+                                </div>
 
-                        <div className="grid gap-5 lg:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label>Главное фото</Label>
-                                <div className="relative">
-                                    <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                            setForm((prev) => ({
-                                                ...prev,
-                                                image: e.target.files?.[0] || null,
-                                            }))
-                                        }
-                                        className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 pl-10 text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-[#ff3495] file:px-3 file:py-2 file:text-white"
+                                <div className="space-y-2">
+                                    <Label>Транспорт</Label>
+                                    <select
+                                        value={form.transport}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, transport: e.target.value }))}
+                                        className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
+                                    >
+                                        <option value="car" className="text-black">Авто</option>
+                                        <option value="bus" className="text-black">Автобус</option>
+                                        <option value="walking" className="text-black">Пеший</option>
+                                    </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Бюджет</Label>
+                                    <select
+                                        value={form.budget}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, budget: e.target.value }))}
+                                        className="h-[50px] w-full rounded-[18px] border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-[#ff3495]"
+                                    >
+                                        <option value="econom" className="text-black">Эконом</option>
+                                        <option value="medium" className="text-black">Средний</option>
+                                    </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Цена</Label>
+                                    <Input
+                                        value={form.priceFrom}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, priceFrom: e.target.value }))}
                                         required
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Галерея</Label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={(e) =>
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            gallery: Array.from(e.target.files || []),
-                                        }))
-                                    }
-                                    className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white"
-                                />
-                            </div>
-                        </div>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label>Интересы через запятую</Label>
+                                    <Input
+                                        value={form.interests}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, interests: e.target.value }))}
+                                    />
+                                </div>
 
-                        <label className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/5 px-4 py-4">
-                            <input
-                                type="checkbox"
-                                checked={form.volunteer}
-                                onChange={(e) => setForm((prev) => ({ ...prev, volunteer: e.target.checked }))}
-                                className="h-4 w-4 accent-[#ff3495]"
-                            />
-                            <div>
-                                <div className="text-sm font-semibold text-white">Волонтёрский маршрут</div>
-                                <div className="text-xs text-white/45">
-                                    Отметить как социально значимую поездку
+                                <div className="space-y-2">
+                                    <Label>Советы через запятую</Label>
+                                    <Input
+                                        value={form.tips}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, tips: e.target.value }))}
+                                    />
                                 </div>
                             </div>
-                        </label>
 
-                        {form.volunteer ? (
-                            <div className="space-y-2">
-                                <Label>Социально значимый вклад</Label>
-                                <textarea
-                                    rows={3}
-                                    value={form.volunteerImpact}
-                                    onChange={(e) =>
-                                        setForm((prev) => ({ ...prev, volunteerImpact: e.target.value }))
-                                    }
-                                    placeholder="Например: уборка троп, помощь природе, работа с местным сообществом"
-                                    className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label>Главное фото</Label>
+                                    <div className="relative">
+                                        <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                                setForm((prev) => ({
+                                                    ...prev,
+                                                    image: e.target.files?.[0] || null,
+                                                }))
+                                            }
+                                            className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 pl-10 text-sm text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-[#ff3495] file:px-3 file:py-2 file:text-white"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Галерея</Label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={(e) =>
+                                            setForm((prev) => ({
+                                                ...prev,
+                                                gallery: Array.from(e.target.files || []),
+                                            }))
+                                        }
+                                        className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-white file:mr-3 file:rounded-[12px] file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <label className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/5 px-4 py-4">
+                                <input
+                                    type="checkbox"
+                                    checked={form.volunteer}
+                                    onChange={(e) => setForm((prev) => ({ ...prev, volunteer: e.target.checked }))}
+                                    className="h-4 w-4 accent-[#ff3495]"
                                 />
-                            </div>
-                        ) : null}
+                                <div>
+                                    <div className="text-sm font-semibold text-white">Волонтёрский маршрут</div>
+                                </div>
+                            </label>
 
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between gap-3">
-                                <Label>Даты маршрута и места</Label>
-                                <button
-                                    type="button"
-                                    onClick={addSlot}
-                                    className="inline-flex items-center gap-2 rounded-[14px] border border-[#ff3495] px-4 py-2 text-sm font-semibold text-[#ff3495] transition hover:bg-[#ff3495]/10"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    Добавить дату
-                                </button>
-                            </div>
+                            {form.volunteer ? (
+                                <div className="space-y-2">
+                                    <Label>Социально значимый вклад</Label>
+                                    <textarea
+                                        rows={3}
+                                        value={form.volunteerImpact}
+                                        onChange={(e) =>
+                                            setForm((prev) => ({ ...prev, volunteerImpact: e.target.value }))
+                                        }
+                                        className="w-full rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-[#ff3495]"
+                                    />
+                                </div>
+                            ) : null}
 
-                            <div className="grid gap-3">
-                                {form.slots.map((slot, index) => (
-                                    <div
-                                        key={index}
-                                        className="grid gap-3 rounded-[18px] border border-white/10 bg-white/5 p-4 sm:grid-cols-[1fr_180px_56px]"
+                            <div className="space-y-3">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <Label>Даты маршрута и места</Label>
+                                    <button
+                                        type="button"
+                                        onClick={addSlot}
+                                        className="inline-flex items-center justify-center gap-2 rounded-[14px] border border-[#ff3495] px-4 py-2 text-sm font-semibold text-[#ff3495] transition hover:bg-[#ff3495]/10"
                                     >
-                                        <div className="space-y-2">
-                                            <Label>Дата</Label>
-                                            <div className="relative">
-                                                <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                        <Plus className="h-4 w-4" />
+                                        Добавить дату
+                                    </button>
+                                </div>
+
+                                <div className="grid gap-3">
+                                    {form.slots.map((slot, index) => (
+                                        <div
+                                            key={index}
+                                            className="grid gap-3 rounded-[18px] border border-white/10 bg-white/5 p-4 lg:grid-cols-[1fr_180px_56px]"
+                                        >
+                                            <div className="space-y-2">
+                                                <Label>Дата</Label>
+                                                <div className="relative">
+                                                    <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ff3495]" />
+                                                    <input
+                                                        type="date"
+                                                        min={today}
+                                                        value={slot.date}
+                                                        onChange={(e) => updateSlot(index, "date", e.target.value)}
+                                                        className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] pl-10 pr-4 text-white outline-none focus:border-[#ff3495]"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>Мест</Label>
                                                 <input
-                                                    type="date"
-                                                    min={today}
-                                                    value={slot.date}
-                                                    onChange={(e) => updateSlot(index, "date", e.target.value)}
-                                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] pl-10 pr-4 text-white outline-none"
+                                                    type="number"
+                                                    min="1"
+                                                    value={slot.capacity}
+                                                    onChange={(e) => updateSlot(index, "capacity", e.target.value)}
+                                                    className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] px-4 text-white outline-none focus:border-[#ff3495]"
                                                     required
                                                 />
                                             </div>
-                                        </div>
 
-                                        <div className="space-y-2">
-                                            <Label>Мест</Label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={slot.capacity}
-                                                onChange={(e) => updateSlot(index, "capacity", e.target.value)}
-                                                className="h-[50px] w-full rounded-[18px] border border-white/10 bg-[#0f0f0f] px-4 text-white outline-none focus:border-[#ff3495]"
-                                                required
-                                            />
+                                            <div className="flex items-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSlot(index)}
+                                                    className="flex h-[50px] w-full items-center justify-center rounded-[18px] border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </div>
-
-                                        <div className="flex items-end">
-                                            <button
-                                                type="button"
-                                                onClick={() => removeSlot(index)}
-                                                className="flex h-[50px] w-full items-center justify-center rounded-[18px] border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
 
-
-                        <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row">
-                            <button
-                                type="submit"
-                                className="inline-flex h-12 flex-1 items-center justify-center rounded-[18px] bg-[#ff3495] px-5 text-sm font-semibold text-white transition hover:bg-[#e52883]"
-                            >
-                                Добавить маршрут
-                            </button>
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="inline-flex h-12 items-center justify-center rounded-[18px] border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
-                            >
-                                Отмена
-                            </button>
-                        </div>
-                    </form>
-                </motion.div>
+                            <div className="sticky bottom-0 -mx-4 mt-1 border-t border-white/10 bg-[#080808] px-4 pb-1 pt-4 sm:-mx-8 sm:px-8">
+                                <div className="flex flex-col gap-3 sm:flex-row">
+                                    <button
+                                        type="submit"
+                                        className="inline-flex h-12 flex-1 items-center justify-center rounded-[18px] bg-[#ff3495] px-5 text-sm font-semibold text-white transition hover:bg-[#e52883]"
+                                    >
+                                        Добавить маршрут
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        className="inline-flex h-12 items-center justify-center rounded-[18px] border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
+                                    >
+                                        Отмена
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
             </motion.div>
         </AnimatePresence>
     );

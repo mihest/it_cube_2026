@@ -65,11 +65,6 @@ export default function AdminBookingsModal({
                                 <h2 className="text-2xl font-black uppercase sm:text-3xl">
                                     Бронирования маршрутов
                                 </h2>
-                                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/65">
-                                    Это демо-заглушка без БД. Здесь можно просматривать заявки,
-                                    видеть информацию о пользователе и маршруте, менять статус брони
-                                    и добавлять маршруты локально.
-                                </p>
                             </div>
 
                             <div className="flex items-center gap-3">

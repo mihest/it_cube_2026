@@ -16,7 +16,7 @@ export default function FilterPanel({
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="lg:sticky lg:top-6 flex items-center align-center"
+            className="lg:sticky lg:top-6 flex items-center align-center justify-center"
         >
             <Card className="overflow-hidden text-white">
                 <div className="rounded-t-[32px] border border-[3px] border-[#ff3495] border-b-0 bg-[rgba(255,52,149,0.22)] px-4 py-5 backdrop-blur-2xl sm:px-6 lg:px-8">
