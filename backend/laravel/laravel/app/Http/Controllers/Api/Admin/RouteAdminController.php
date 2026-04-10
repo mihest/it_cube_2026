@@ -291,7 +291,7 @@ class RouteAdminController extends Controller
             return $path;
         }
 
-        return Storage::url($path);
+        return url(Storage::url($path));
     }
 
     protected function isExternalUrl(string $path): bool
