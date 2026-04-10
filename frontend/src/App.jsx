@@ -4,6 +4,32 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 
+let mock = [
+    {
+        id: 1,
+        title: "Эко-маршрут «Чепца и сосновый бор»",
+        shortDescription: "Двухдневная поездка по природным локациям с лёгким волонтёрским блоком по уборке тропы.",
+        fullDescription:        "Маршрут сочетает пешие прогулки по сосновому бору, обзорные точки у реки Чепцы и короткую эко-акцию вместе с местными волонтёрами. Подходит для тех, кто хочет совместить отдых и полезную активность.",
+        duration: "2",
+        company: ["friends", "solo"],
+        transport: "car",
+        budget: "medium",
+        interests: ["nature", "active", "volunteer"],
+        volunteer: true,
+        petsAllowed: false,
+        kidsAllowed: true,
+        typeLabel: "Автомобильный",
+        place: "Глазовский район",
+        image:        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop",
+        gallery: [
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop"
+        ],
+        tips: ["Удобная обувь", "Перчатки для эко-акции", "Вода и дождевик"],
+    },
+]
+
 function App() {
   const [count, setCount] = useState(0)
 
